@@ -34,6 +34,8 @@ def preproc(filename):
             euler3[i*ycells+j] = float(Euler3)
 
     f = open(filename+'_reordered.ctf', 'w')
+    f.write("XCells {:d}\n".format(xcells))
+    f.write("YCells {:d}\n".format(ycells))
     f.write("X       Y       Euler1  Euler2  Euler3\n")
     msg = "{:.5f}  {:.5f}  {:.5f}  {:.5f}  {:.5f}\n"
     for i in range(xcells):
