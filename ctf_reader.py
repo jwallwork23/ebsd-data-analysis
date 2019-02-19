@@ -62,6 +62,10 @@ def ctf_reader(filename, column_wise=False):
         line = f.readline()
 
         # Skip the boiler plate at the top of the file
+        if i == 4:
+            xcells = line.split()[1]
+        elif i == 5:
+            ycells = line.split()[1]
         if i < 15:
             continue
 
