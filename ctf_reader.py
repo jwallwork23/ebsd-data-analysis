@@ -4,37 +4,48 @@ from maths import orientation_matrix, compute_misorientation
 
 
 def ctf_reader(filename):
+    """
+    Function which takes a (reformatted) .ctf file and computes misorientations, distances and
+    averages for the data therein.
+    """
 
     # Open file, get number of x and y values
-    f = open(filename + '_reordered.ctf', 'r')
-    xcells = int(f.readline().split()[1])
-    ycells = int(f.readline().split()[1])
-    f.readline()  # Skip headings row
+    try:
+        f = open(filename + '_reordered.ctf', 'r')
+    except:
+        msg = "File {:s} either does not exist or needs to be reformatted using -r option."
+        IOError(msg.format(filename))
+    xcells = int(f.readline().split()[1])  # Get extent in x-direction
+    ycells = int(f.readline().split()[1])  # Get extent in y-direction
+    n = xcells*ycells                      # Total extent
+    f.readline()                           # Skip headings row
 
     # Counters, etc.
     cnt = 0
-    started = False
-    Euler_ = None
-    X_ = 0.  # Set to initial X value
+    started = False  # Boolean variable to indicate misorientation calculation
+    Euler_ = None    # Previous Euler angle
+    X_ = 0.          # Previous X value (Set to initial X value)
     out = "X {x:6.1f} Y1 {y1:6.1f} Y2 {y2:6.1f} dist. {d:6.1f} mis. {m:6.3f}"  # For outputting
 
     # Dictionaries for data storage  TODO: These could probably just be lists of dicts
-    dist_and_theta = {}
+    averages = []
     averages_x = []
     averages_r = []
     dist_and_theta = {}
-    averages = {}
     dist_and_theta[0] = {}
     dist_and_theta[0]['x'] = 0.
     dist_and_theta[0]['dist'] = []
     dist_and_theta[0]['theta'] = []
-    averages[0] = {}
+
+    # Open file for output
+    g = open('misorientations.txt', 'w')
+    g.write('{:6s} {:6s} {:6s} {:8s} {:8s}\n'.format('X','Y1','Y2','distance','misorientation'))
     
     # Read each line of the file in order
-    for i in range(xcells*ycells):
+    for i in range(n):
         line = f.readline()
 
-        # Read line from file
+        # Read line from file and convert to floating point
         X, Y, Euler1, Euler2, Euler3 = line.split()
         X = float(X)
         Y = float(Y)
@@ -48,17 +59,16 @@ def ctf_reader(filename):
             dist_and_theta[cnt]['x'] = X
             dist_and_theta[cnt]['dist'] = []
             dist_and_theta[cnt]['theta'] = []
-            averages[cnt] = {}
-            averages_x.append(X)
+            averages_x.append(np.average(dist_and_theta[cnt]['dist']))
             averages_r.append(np.average(dist_and_theta[cnt]['theta']))
-            averages_r[cnt-1] /= np.average(dist_and_theta[cnt]['dist'])
+            averages.append(averages_r[cnt-1] / averages_x[cnt-1])
             Euler_ = None
 
         # Compute misorientation between two consecutive Euler angles
         if Euler_ is not None:
             misorientation = compute_misorientation(Euler_, Euler)
 
-            # If misorientation is greater than 5 degrees, do stuff
+            # If misorientation is greater than 5 degrees, do stuff...
             if (misorientation > 5.) and not started:
                 started = True
                 X_ = X
@@ -67,8 +77,9 @@ def ctf_reader(filename):
             if (misorientation > 5.) and started:
                 started = False
                 distance = Y-Y_
-                print(out.format(x=X,y1=Y_,y2=Y,d=distance,m=misorientation))
-                # TODO: Print to file
+                if i % 10 == 0:
+                    print('{:.2f}% complete'.format(float(i)/float(n)*100))
+                g.write('{:6.1f} {:6.1f} {:6.1f} {:8.1f} {:8.3f}\n'.format(X,Y_,Y,distance,misorientation))
                 dist_and_theta[cnt]['dist'].append(distance)
                 dist_and_theta[cnt]['theta'].append(misorientation)
 
@@ -87,6 +98,7 @@ if __name__ == "__main__":
 
     import argparse
 
+    # Read input from command prompt
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', help="Filename to load from (excluding .ctf extension)")
     parser.add_argument('-r', help="Reorder data storage X-Y precedence using preprocessor")
@@ -99,7 +111,13 @@ if __name__ == "__main__":
         preproc.preproc(filename)
 
     # Compute misorientations
-    x, r = ctf_reader(args.f)
+    if args.f is None:
+        raise ValueError("Enter a file to read using -f option.")
+    try:
+        x, r = ctf_reader(args.f)
+    except:
+        msg = "Requested file {:s} either does not exist or cannot be opened."
+        raise ValueError(msg.format(args.f))
     f = open('averages.txt', 'w')
     for i in range(len(x)):
         f.write('{:6.3f} {:6.3f}\n'.format(x[i], r[i]))
