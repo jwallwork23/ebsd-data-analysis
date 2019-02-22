@@ -13,7 +13,7 @@ def orientation_matrix(euler_angle):
     # Assemble orientation matrix
     M = np.zeros([3, 3])
     M[0,0] = cos(phi1)*cos(phi2) - sin(phi1)*sin(phi2)*cos(Phi)
-    M[0,1] = sin(phi1)*cos(phi2) - cos(phi1)*sin(phi2)*cos(Phi)
+    M[0,1] = sin(phi1)*cos(phi2) + cos(phi1)*sin(phi2)*cos(Phi)
     M[0,2] = sin(phi2)*sin(Phi)
     M[1,0] = -cos(phi1)*sin(phi2) - sin(phi1)*cos(phi2)*cos(Phi)
     M[1,1] = -sin(phi1)*sin(phi2) + cos(phi1)*cos(phi2)*cos(Phi)
@@ -31,10 +31,13 @@ def compute_misorientation(euler_angle1, euler_angle2):
     M2 = orientation_matrix(euler_angle2)
 
     # Calculate misorientation
-    M = M1*np.linalg.inv(M2)
+    M = np.dot(M1, np.linalg.inv(M2))
 
     # Get angle
     cosTheta = (M[0,0]+M[1,1]+M[2,2]-1.)/2
+    eps = 1e-6
+    if 1-eps < cosTheta < 1+eps:
+        cosTheta = 1
 
     return np.rad2deg(acos(cosTheta))
 
@@ -87,7 +90,7 @@ def ctf_reader(filename):
             averages[cnt] = {}
             averages_x.append(X)
             averages_r.append(np.average(dist_and_theta[cnt]['theta']))
-            averages_r[cnt] /= np.average(dist_and_theta[cnt]['dist'])
+            averages_r[cnt-1] /= np.average(dist_and_theta[cnt]['dist'])
             Euler_ = None
 
         # Compute misorientation between two consecutive Euler angles
