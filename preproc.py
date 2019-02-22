@@ -42,13 +42,3 @@ def preproc(filename):
         for j in range(ycells):
             f.write(msg.format(xstep*i,ystep*j,euler1[i*ycells+j],euler2[i*ycells+j],euler3[i*ycells+j]))
     f.close()
-
-
-if __name__ == "__main__":
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-f', help="Filename to load from (excluding .ctf extension)")
-    args = parser.parse_args()
-
-    preproc(args.f)
