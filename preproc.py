@@ -35,6 +35,7 @@ def preproc(filename):
 
     # Print to file
     f = open(filename+'_reordered.ctf', 'w')
+    f.write("XStep {:d}\n".format(xstep))
     f.write("XCells {:d}\n".format(xcells))
     f.write("YCells {:d}\n".format(ycells))
     f.write("X       Y       Euler1  Euler2  Euler3\n")
