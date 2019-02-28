@@ -1,11 +1,21 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
 
-def plot_ratio(x, r, filename=''):
+def plot_ratio(x, r, running_average=0, filename=''):
     """
     Plot ratio between average distances and average misorientations.
     """
-    plt.plot(x, r)
+    N = running_average
+
+    # Take running average over 2*N+1 pixels
+    if N>0:
+        r = np.convolve(r, np.ones(2*N+1)/(2*N+1), mode='valid')
+        plt.plot(x[N:-N], r, 'x')
+
+    # If N == 0, just plot unaveraged data
+    else:
+        plt.plot(x, r, 'x')
     plt.xlabel('x')
     plt.ylabel('Average misorientation / average distance')
     plt.savefig(filename+'.pdf')
