@@ -1,6 +1,6 @@
 import numpy as np
 
-from maths import orientation_matrix, compute_misorientation
+from maths import compute_misorientation
 
 
 def ctf_reader(filename):
@@ -22,17 +22,16 @@ def ctf_reader(filename):
     f.readline()                            # Skip headings row
 
     cnt = -1  # Counter for current x-level (becomes 0 at start of first loop)
-    out = "X {x:6.1f} Y1 {y1:6.1f} Y2 {y2:6.1f} dist. {d:6.1f} mis. {m:6.3f}"  # For outputting
 
     # Dictionary for data storage
-    misorientation_data = {}
-    misorientation_data['x'] = [xstep*i for i in range(xcells)]
-    misorientation_data['dist'] = []
-    misorientation_data['theta'] = []
+    dat = {}
+    dat['x'] = [xstep*i for i in range(xcells)]
+    dat['dist'] = []
+    dat['theta'] = []
 
     # Open file for output and write header
     g = open(filename + '_misorientations.txt', 'w')
-    g.write('{:6s} {:6s} {:6s} {:8s} {:8s}\n'.format('X','Y1','Y2','distance','misorientation'))
+    g.write("{:6s} {:6s} {:6s} {:8s} {:8s}\n".format('X','Y1','Y2','distance','misorientation'))
     
     # Read each line of the file in order
     for i in range(n):
@@ -49,9 +48,9 @@ def ctf_reader(filename):
             cnt += 1                                 # Current x-position index
             started = False                          # Indicates misorientation calculation underway
             Euler_ = None                            # Euler angle from previous step
-            misorientation_data['x'][cnt] = X        # Current x-position
-            misorientation_data['dist'].append([])   # NOTE: We do not know the length of these
-            misorientation_data['theta'].append([])  #       arrays a priori => dynamic allocation
+            dat['x'][cnt] = X        # Current x-position
+            dat['dist'].append([])   # NOTE: We do not know the length of these
+            dat['theta'].append([])  #       arrays a priori => dynamic allocation
 
         # Compute misorientation between two consecutive Euler angles
         if Euler_ is not None:
@@ -65,25 +64,25 @@ def ctf_reader(filename):
             if (misorientation > 5.) and started:
                 started = False
                 distance = Y-Y_
-                msg = '{:6.1f} {:6.1f} {:6.1f} {:8.1f} {:8.3f}\n'
+                msg = "{:6.1f} {:6.1f} {:6.1f} {:8.1f} {:8.3f}\n"
                 g.write(msg.format(X,Y_,Y,distance,misorientation))
-                misorientation_data['dist'][cnt].append(distance)
-                misorientation_data['theta'][cnt].append(misorientation)
+                dat['dist'][cnt].append(distance)
+                dat['theta'][cnt].append(misorientation)
 
         # Save Euler angles from previous step
         Euler_ = Euler
 
         # Print progress to screen every 100 steps
         if i % 100 == 0:
-            print('{:.2f}% complete'.format(float(i)/float(n)*100))
-    print('Done!')
+            print("{:.2f}% complete".format(float(i)/float(n)*100))
+    print("Done!")
 
     # Take averages of the misorientations and associated distances and return ratios thereof
     averages = np.zeros(xcells)
     for i in range(xcells):
-        averages[i] = np.average(misorientation_data['theta'][i])
-        averages[i] /= np.average(misorientation_data['dist'][i])
+        averages[i] = np.average(dat['theta'][i])
+        averages[i] /= np.average(dat['dist'][i])
     f.close()
     g.close()
 
-    return misorientation_data['x'], averages
+    return dat['x'], averages
