@@ -62,8 +62,8 @@ def ctf_reader(filename):
                 Y_ = Y
                 continue
             if (misorientation > 5.) and started:
-                started = False
                 distance = Y-Y_
+                Y_ = Y
                 msg = "{:6.1f} {:6.1f} {:6.1f} {:8.1f} {:8.3f}\n"
                 g.write(msg.format(X,Y_,Y,distance,misorientation))
                 dat['dist'][cnt].append(distance)
