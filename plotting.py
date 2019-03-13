@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot_ratio(x, r, running_average=0, filename=''):
+def plot_ratio(x, r, filename='', running_average=0):
     """
     Plot ratio between average distances and average misorientations.
     """
@@ -28,8 +28,10 @@ if __name__ == "__main__":
     # Read input from command prompt
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', help="Filename to load from (excluding .ctf extension)")
+    parser.add_argument('-m', help="Integer value for running mean")
     args = parser.parse_args()
     filename = args.f
+    m = int(args.m) if args.m is not None else 0
 
     # Read data from averages file
     f = open(filename + '_averages.txt', 'r')
@@ -43,4 +45,4 @@ if __name__ == "__main__":
     f.close()
 
     # Plot data
-    plot_ratio(x, r, filename)
+    plot_ratio(x, r, filename, m)
