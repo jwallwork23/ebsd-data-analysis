@@ -5,3 +5,4 @@ saved/
 *.swp
 *.ipynb
 *.pdf
+.DS_Store
