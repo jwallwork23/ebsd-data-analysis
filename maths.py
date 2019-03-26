@@ -1,6 +1,6 @@
 import numpy as np
 from math import cos, sin, acos
-
+import disoriQ as Q
 
 def orientation_matrix(euler_angle):
     """
@@ -45,3 +45,14 @@ def compute_misorientation(euler_angle1, euler_angle2):
         cosTheta = 1
 
     return np.rad2deg(acos(cosTheta))
+
+def compute_misorientation_quat(euler1, euler2):
+    quat1 = Q.euler2quat(euler1)
+    quat2 = Q.euler2quat(euler2)
+
+    misori=Q.disori(quat1,quat2,Q.symeq('cubic'))
+    eps = 1e-6
+    if 1-eps < misori < 1+eps:
+        misori = 1
+
+    return np.rad2deg(acos(misori))

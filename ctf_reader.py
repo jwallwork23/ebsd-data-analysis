@@ -1,6 +1,6 @@
 import numpy as np
 
-from maths import compute_misorientation
+from maths import compute_misorientation_quat
 
 
 def ctf_reader(filename):
@@ -54,7 +54,7 @@ def ctf_reader(filename):
 
         # Compute misorientation between two consecutive Euler angles
         if Euler_ is not None:
-            misorientation = compute_misorientation(Euler_, Euler)
+            misorientation = compute_misorientation_quat(Euler_, Euler)
 
             # If misorientation is greater than 5 degrees, do stuff...
             if (misorientation > 5.) and not started:
