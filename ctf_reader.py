@@ -57,11 +57,11 @@ def ctf_reader(filename):
             misorientation = compute_misorientation_quat(Euler_, Euler)
 
             # If misorientation is greater than 5 degrees, do stuff...
-            if (misorientation > 5.) and not started:
+            if (misorientation < 10.) and not started:
                 started = True
                 Y_ = Y
                 continue
-            if (misorientation > 5.) and started:
+            if (misorientation < 10.) and started:
                 distance = Y-Y_
                 Y_ = Y
                 msg = "{:6.1f} {:6.1f} {:6.1f} {:8.1f} {:8.3f}\n"
