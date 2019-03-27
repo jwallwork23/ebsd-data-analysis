@@ -1,52 +1,103 @@
-import numpy as np
-from math import cos, sin, acos
-import disoriQ as Q
-
-def orientation_matrix(euler_angle):
-    """
-    Assemble orientation matrix associated with given Euler angle.
-    """
-
-    # Convert from degrees to radians
-    phi1 = np.deg2rad(euler_angle[0])
-    Phi  = np.deg2rad(euler_angle[1])
-    phi2 = np.deg2rad(euler_angle[2])
-
-    # Assemble orientation matrix
-    M = np.zeros([3, 3])
-    M[0,0] = cos(phi1)*cos(phi2) - sin(phi1)*sin(phi2)*cos(Phi)
-    M[0,1] = sin(phi1)*cos(phi2) + cos(phi1)*sin(phi2)*cos(Phi)
-    M[0,2] = sin(phi2)*sin(Phi)
-    M[1,0] = -cos(phi1)*sin(phi2) - sin(phi1)*cos(phi2)*cos(Phi)
-    M[1,1] = -sin(phi1)*sin(phi2) + cos(phi1)*cos(phi2)*cos(Phi)
-    M[1,2] = cos(phi2)*sin(Phi)
-    M[2,0] = sin(phi1)*sin(Phi)
-    M[2,1] = -cos(phi1)*sin(Phi)
-    M[2,2] = cos(Phi)
-    return M
+import numpy as N
 
 
-def compute_misorientation(euler_angle1, euler_angle2):
-    """
-    Compute misorientation between two given Euler angles.
-    """
+def disori(a,b,s):
+	misori=[]
+	for q in s:
+		c = N.dot(a,dq(b,q))
+		misori.append(c)
+	dis= max(N.array(abs(N.array(misori))))
+	return  dis
 
-    # Assemble orientation matrices
-    M1 = orientation_matrix(euler_angle1)
-    M2 = orientation_matrix(euler_angle2)
+def euler2quat(euler):
+	phi1=euler[0]
+	phi=euler[1]
+	phi2=euler[2]
+	
+	quat=N.array([0.0,0.0,0.0,0.0])
+	quat[0]= N.cos(phi/2.)*N.cos((phi1+phi2)/2.)
+	quat[1]=-N.sin(phi/2.)*N.cos((phi2-phi1)/2.)
+	quat[2]= N.sin(phi/2.)*N.sin((phi2-phi1)/2.)
+	quat[3]=-N.cos(phi/2.)*N.sin((phi1+phi2)/2.)
+	quat=N.array(quat)
+	if (quat[0]<0):
+		quat=quat*-1
+		
+	return quat	
 
-    # Calculate misorientation
-    M = np.dot(M1, np.linalg.inv(M2))
+def dq(a,b): #quaternion product: q1q2=(s1,v1)(s2,v2)=(s1s2-v1.v2,s1v2+s2v1+v1xv2)
+	mq=N.array([0.,0.,0.,0.])
+	mq[0]=a[0]*b[0]-N.dot(a[1:4],b[1:4])
+	mq[1:4]=a[0]*b[1:4]+b[0]*a[1:4]+N.cross(a[1:4],b[1:4])
+	if (mq[0]<0):
+		mq=-mq
+	return mq	
 
-    # Get angle
-    cosTheta = (M[0,0]+M[1,1]+M[2,2]-1.)/2
-    eps = 1e-6
-    if 1-eps < cosTheta < 1+eps:
-        cosTheta = 1
+def symeq(group):
 
-    return np.rad2deg(acos(cosTheta))
+	qsym=[]
+	qsym.append(N.array([1.0 , 0.0 , 0.0 , 0.0]))
+	
+	#from Pete Bate's fspl_orir.f90 code
+	#cubic tetrads(100)
+	
+	qsym.append(N.array([0.7071068 , 0.7071068, 0.0, 0.0]))
+	qsym.append(N.array([0.0 , 1.0 , 0.0, 0.0 ]))
+	qsym.append(N.array([0.7071068 , -0.7071068, 0.0, 0.0]))
+	
+	qsym.append(N.array([0.7071068, 0.0, 0.7071068, 0.0 ]))
+	qsym.append(N.array([0.0 , 0.0 , 1.0 , 0.0]))
+	qsym.append(N.array([0.7071068, 0.0 ,-0.7071068, 0.0]))
+	
+	qsym.append(N.array([0.7071068, 0.0 , 0.0 , 0.7071068]))
+	qsym.append(N.array([0.0 , 0.0 , 0.0 , 1.0]))
+	qsym.append(N.array([0.7071068, 0.0 , 0.0 , -0.7071068]))
+	
+	#cubic dyads (110)
+	
+	qsym.append(N.array([0.0 , 0.7071068 , 0.7071068 , 0.0]))
+	qsym.append(N.array([0.0 , -0.7071068 , 0.7071068 , 0.0]))
+	
+	qsym.append(N.array([0.0 , 0.7071068 , 0.0 , 0.7071068]))
+	qsym.append(N.array([0.0 , -0.7071068 , 0.0 , 0.7071068]))
+	
+	qsym.append(N.array([0.0 , 0.0 , 0.7071068 , 0.7071068]))
+	qsym.append(N.array([0.0 , 0.0 , -0.7071068 , 0.7071068]))
+	
+	#cubic triads (111)
+	
+	qsym.append(N.array([0.5, 0.5 , 0.5 , 0.5]))
+	qsym.append(N.array([0.5, -0.5 , -0.5 , -0.5]))
+	
+	qsym.append(N.array([0.5, -0.5 , 0.5 , 0.5]))
+	qsym.append(N.array([0.5, 0.5 , -0.5 , -0.5]))
+	
+	qsym.append(N.array([0.5, 0.5 , -0.5 , 0.5]))
+	qsym.append(N.array([0.5, -0.5 , 0.5 , -0.5]))
+	
+	qsym.append(N.array([0.5, 0.5 , 0.5 , -0.5]))
+	qsym.append(N.array([0.5, -0.5 , -0.5 , 0.5]))
+	
+	#hexagonal hexads
+	
+	qsym.append(N.array([0.866254 , 0.0 , 0.0 , 0.5]))
+	qsym.append(N.array([0.5 , 0.0 , 0.0 , 0.866254]))
+	qsym.append(N.array([0.5 , 0.0 , 0.0 , -0.866254]))
+	qsym.append(N.array([0.866254 , 0.0 , 0.0 , -0.5]))
+	
+	#hexagonal diads
+	
+	qsym.append(N.array([0.0, -0.5 , 0.866254 , 0.0]))
+	qsym.append(N.array([0.0, -0.5 , -0.866254 , 0.0]))
+	
+	if (group =='cubic'):
+		symlist=qsym[0:24]
+	if (group =='hexagonal'):
+		symlist=[qsym[0], qsym[2], qsym[8]] + qsym[-6:30]
+	
+	return symlist
 
-def compute_misorientation_quat(euler1, euler2):
+def compute_misorientation(euler1, euler2):
     quat1 = Q.euler2quat(euler1)
     quat2 = Q.euler2quat(euler2)
 
@@ -55,4 +106,4 @@ def compute_misorientation_quat(euler1, euler2):
     if 1-eps < misori < 1+eps:
         misori = 1
 
-    return np.rad2deg(acos(misori))
+    return N.rad2deg(N.acos(misori))
