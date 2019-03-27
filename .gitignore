@@ -1,8 +1,13 @@
+# directories
 __pycache__/
 saved/
+
+# files
+TODO
+
+# file types
 *.txt
 *.ctf
 *.swp
-*.ipynb
 *.pdf
 .DS_Store
