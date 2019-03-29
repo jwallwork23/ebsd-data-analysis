@@ -12,31 +12,16 @@ parser.add_argument('-r', help="Reorder data storage X-Y precedence using prepro
 parser.add_argument('-p', help="Plot results")
 args = parser.parse_args()
 filename = args.f
-
-# Check validity of filename
-if args.f is None:
+if filename is None:
     raise ValueError("Enter a file to read using -f option.")
-try:
-    f = open(flename + '.ctf', 'r')
-    f.close()
-except:
-    msg = "Requested file {:s} either does not exist or cannot be opened."
-    raise ValueError(msg.format(args.f))
 
-# Preprocess data, if requested
+# Preprocess data
 if args.r is not None:
     preproc(filename)
 
 # Compute misorientations
-x, r = ctf_reader(args.f)
+ctf_reader(args.f)
 
-# Write averages to file  TODO: why is this not done in ctf_reader?
-f = open(filename + '_averages.txt', 'w')
-f.write('{:d}\n'.format(len(x)))
-for i in range(len(x)):
-    f.write('{:6.1f} {:6.3f}\n'.format(x[i], r[i]))
-f.close()
-
-# Plot, if requested
+# Plot
 if args.p is not None:
     plot_ratio(filename, args.f)

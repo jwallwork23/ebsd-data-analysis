@@ -15,8 +15,12 @@ def plot_ratio(filename, running_average=0):
                             the data is plotted without the computation of a running average.
     """
 
-    # Read from file
-    f = open(filename + '_averages.txt', 'r')
+    # Read from file  TODO: .npy file would make this easier
+    try:
+        f = open(filename + '_averages.txt', 'r')
+    except:
+        msg = "Requested file '{:s}' has not yet been averaged. Please run `ctf_reader`."
+        raise ValueError(msg.format(filename))
     xcells = int(f.readline())
     x = np.zeros(xcells)
     r = np.zeros(xcells)

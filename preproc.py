@@ -12,9 +12,13 @@ def preproc(filename):
 
     :arg filename: name of datafile, with .ctf extension removed.
     """
+    try:
+        f = open(filename + '.ctf', 'r')
+    except:
+        msg = "Requested file '{:s}' either does not exist or cannot be opened."
+        raise ValueError(msg.format(filename))
 
     # Create file and read 'boiler plate' at top
-    f = open(filename+'.ctf', 'r')
     for i in range(4):
         f.readline()
     xcells = int(f.readline().split()[1])
@@ -41,7 +45,7 @@ def preproc(filename):
             euler3[i*ycells+j] = float(Euler3)
 
     # Print to file  TODO: could work with .npy files
-    f = open(filename+'_reordered.ctf', 'w')
+    f = open(filename + '_reordered.ctf', 'w')
     f.write("XStep {:.1f}\n".format(xstep))
     f.write("XCells {:d}\n".format(xcells))
     f.write("YCells {:d}\n".format(ycells))
