@@ -8,6 +8,11 @@ __all__ = ["plot_ratio"]
 def plot_ratio(filename, running_average=0):
     """
     Plot ratio between average distances and average misorientations.
+
+    :arg filename: name of datafile, with .ctf extension removed.
+    :kwarg running_average: optionally take a running average of the data, over each sequence of 
+                            2*N+1 consecutive pixel, where N = `running_average`. If N == 0 then
+                            the data is plotted without the computation of a running average.
     """
 
     # Read from file

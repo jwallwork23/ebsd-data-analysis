@@ -13,18 +13,24 @@ parser.add_argument('-p', help="Plot results")
 args = parser.parse_args()
 filename = args.f
 
+# Check validity of filename
+if args.f is None:
+    raise ValueError("Enter a file to read using -f option.")
+try:
+    f = open(flename + '.ctf', 'r')
+    f.close()
+except:
+    msg = "Requested file {:s} either does not exist or cannot be opened."
+    raise ValueError(msg.format(args.f))
+
 # Preprocess data, if requested
 if args.r is not None:
     preproc(filename)
 
 # Compute misorientations
-if args.f is None:
-    raise ValueError("Enter a file to read using -f option.")
-try:
-    x, r = ctf_reader(args.f)
-except:
-    msg = "Requested file {:s} either does not exist or cannot be opened."
-    raise ValueError(msg.format(args.f))
+x, r = ctf_reader(args.f)
+
+# Write averages to file  TODO: why is this not done in ctf_reader?
 f = open(filename + '_averages.txt', 'w')
 f.write('{:d}\n'.format(len(x)))
 for i in range(len(x)):

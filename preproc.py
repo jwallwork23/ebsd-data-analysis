@@ -9,6 +9,8 @@ def preproc(filename):
     Read in a .ctf file, exchange the X-Y column ordering precedence and strip out data which is
     irrelevant for our purposes. This allows us to more efficiently compute misorientations in a
     strip in the Y-direction.
+
+    :arg filename: name of datafile, with .ctf extension removed.
     """
 
     # Create file and read 'boiler plate' at top

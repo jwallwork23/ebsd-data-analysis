@@ -10,6 +10,8 @@ def ctf_reader(filename):
     """
     Function which takes a (reformatted) .ctf file and computes misorientations, distances and
     averages for the data therein.
+
+    :arg filename: name of datafile, with .ctf extension removed.
     """
 
     # Open file, get number of x and y values
