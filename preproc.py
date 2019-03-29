@@ -6,21 +6,23 @@ __all__ = ["preproc"]
 
 def preproc(filename):
     """
-    Take in a .ctf file and exchange the X-Y column ordering precedence, so as to easily compute
-    misorientations in a strip in the Y-direction.
+    Read in a .ctf file, exchange the X-Y column ordering precedence and strip out data which is
+    irrelevant for our purposes. This allows us to more efficiently compute misorientations in a
+    strip in the Y-direction.
     """
 
-    # Create file and read 'boiler plate' at top  # TODO: Account for files w/ different boilerplate
+    # Create file and read 'boiler plate' at top
     f = open(filename+'.ctf', 'r')
     for i in range(4):
         f.readline()
     xcells = int(f.readline().split()[1])
     ycells = int(f.readline().split()[1])
+    n = xcells*ycells
     xstep = float(f.readline().split()[1])
     ystep = float(f.readline().split()[1])
-    for i in range(7):
-        f.readline()
-    n = xcells*ycells
+    first_label = ''
+    while first_label != 'Phase':
+        first_label = f.readline().split()[0]  # Once we hit the headings, we are done
 
     # Preallocate arrays for data storage
     euler1 = np.zeros(n)
@@ -36,7 +38,7 @@ def preproc(filename):
             euler2[i*ycells+j] = float(Euler2)
             euler3[i*ycells+j] = float(Euler3)
 
-    # Print to file
+    # Print to file  TODO: could work with .npy files
     f = open(filename+'_reordered.ctf', 'w')
     f.write("XStep {:.1f}\n".format(xstep))
     f.write("XCells {:d}\n".format(xcells))
