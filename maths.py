@@ -1,6 +1,9 @@
 import numpy as N
 
 
+__all__ = ["compute_misorientations"]
+
+
 def disori(a,b,s):
 	misori=[]
 	for q in s:

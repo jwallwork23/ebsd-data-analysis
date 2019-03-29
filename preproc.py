@@ -1,13 +1,16 @@
 import numpy as np
 
 
+__all__ = ["preproc"]
+
+
 def preproc(filename):
     """
     Take in a .ctf file and exchange the X-Y column ordering precedence, so as to easily compute
     misorientations in a strip in the Y-direction.
     """
 
-    # Create file and read 'boiler plate' at top
+    # Create file and read 'boiler plate' at top  # TODO: Account for files w/ different boilerplate
     f = open(filename+'.ctf', 'r')
     for i in range(4):
         f.readline()
@@ -42,5 +45,9 @@ def preproc(filename):
     msg = "{:.5f}  {:.5f}  {:.5f}  {:.5f}  {:.5f}\n"
     for i in range(xcells):
         for j in range(ycells):
-            f.write(msg.format(xstep*i,ystep*j,euler1[i*ycells+j],euler2[i*ycells+j],euler3[i*ycells+j]))
+            f.write(msg.format(xstep*i,
+                               ystep*j,
+                               euler1[i*ycells+j],
+                               euler2[i*ycells+j],
+                               euler3[i*ycells+j]))
     f.close()

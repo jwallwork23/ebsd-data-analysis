@@ -1,6 +1,9 @@
 import numpy as np
 
-from maths import compute_misorientation_quat
+from ebsdda.maths import compute_misorientation
+
+
+__all__ = ["ctf_reader"]
 
 
 def ctf_reader(filename):

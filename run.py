@@ -1,5 +1,8 @@
+from preproc import preproc
+from ctf_reader import ctf_reader
+from plotting import plot_ratio
+
 import argparse
-import ctf_reader
 
 
 # Read input from command prompt
@@ -12,14 +15,13 @@ filename = args.f
 
 # Preprocess data, if requested
 if args.r is not None:
-    import preproc
-    preproc.preproc(filename)
+    preproc(filename)
 
 # Compute misorientations
 if args.f is None:
     raise ValueError("Enter a file to read using -f option.")
 try:
-    x, r = ctf_reader.ctf_reader(args.f)
+    x, r = ctf_reader(args.f)
 except:
     msg = "Requested file {:s} either does not exist or cannot be opened."
     raise ValueError(msg.format(args.f))
@@ -31,5 +33,4 @@ f.close()
 
 # Plot, if requested
 if args.p is not None:
-    import plotting
-    plotting.plot_ratio(x, r, args.f)
+    plot_ratio(filename, args.f)
