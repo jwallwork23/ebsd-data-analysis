@@ -36,7 +36,7 @@ def ctf_reader(filename):
     dat['theta'] = []
 
     # Open file for output and write header
-    g = open(filename + '_misorientations.txt', 'w')
+    g = open(filename + '_misorientations.ctf', 'w')
     g.write("{:6s} {:6s} {:6s} {:8s} {:8s}\n".format('X','Y1','Y2','distance','misorientation'))
 
     # Read each line of the file in order
@@ -74,7 +74,7 @@ def ctf_reader(filename):
                 distance = Y-Y_
                 Y_ = Y
                 msg = "{:6.1f} {:6.1f} {:6.1f} {:8.1f} {:8.3f}\n"
-                g.write(msg.format(X,Y_,Y,distance,misorientation))
+                g.write(msg.format(X, Y_, Y, distance, misorientation))
                 dat['dist'][cnt].append(distance)
                 dat['theta'][cnt].append(misorientation)
 

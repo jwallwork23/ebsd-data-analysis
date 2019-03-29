@@ -14,6 +14,9 @@ def disori(a,b,s):
 	return  dis
 
 def euler2quat(euler):
+        """
+        Convert from Euler angles to the quaternion basis.
+        """
 	phi1=euler[0]
 	phi=euler[1]
 	phi2=euler[2]
@@ -29,7 +32,10 @@ def euler2quat(euler):
 		
 	return quat	
 
-def dq(a,b): #quaternion product: q1q2=(s1,v1)(s2,v2)=(s1s2-v1.v2,s1v2+s2v1+v1xv2)
+def dq(a,b):
+        """
+        Quaternion product: q1q2=(s1,v1)(s2,v2)=(s1s2-v1.v2,s1v2+s2v1+v1xv2)
+        """
 	mq=N.array([0.,0.,0.,0.])
 	mq[0]=a[0]*b[0]-N.dot(a[1:4],b[1:4])
 	mq[1:4]=a[0]*b[1:4]+b[0]*a[1:4]+N.cross(a[1:4],b[1:4])
@@ -102,6 +108,14 @@ def symeq(group):
 	return symlist
 
 def compute_misorientation(euler1, euler2, symlist=None):
+    """
+    Compute the misorientation between two Euler angles.
+
+    :arg euler1: the first Euler angle.
+    :arg euler2: the second Euler angle.
+    :kwarg symlist: array of quaternion coordinates, provided by `symeq`. For efficiency reasons,
+                    it is best to precompute this array.
+    """
     quat1 = euler2quat(euler1)
     quat2 = euler2quat(euler2)
 
