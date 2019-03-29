@@ -21,7 +21,7 @@ def plot_ratio(filename, running_average=0):
     except:
         msg = "Requested file '{:s}' has not yet been averaged. Please run `ctf_reader`."
         raise ValueError(msg.format(filename))
-    xcells = int(f.readline())
+    xcells = int(f.readline().split()[1])
     x = np.zeros(xcells)
     r = np.zeros(xcells)
     for i in range(xcells):

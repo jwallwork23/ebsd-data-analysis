@@ -58,7 +58,7 @@ def ctf_reader(filename):
             dat['dist'].append([])   # NOTE: We do not know the length of these
             dat['theta'].append([])  #       arrays a priori => dynamic allocation
             print("Y-slice {:d}/{:d} ({:.2f}% complete)".format(cnt+1,
-                                                                ycells,
+                                                                xcells,
                                                                 float(i)/float(n)*100))
 
         # Compute misorientation between two consecutive Euler angles using quaternions
@@ -86,7 +86,7 @@ def ctf_reader(filename):
 
     # Take averages of the misorientations and associated distances and take ratios thereof
     f = open(filename + '_averages.txt', 'w')
-    f.write('XCells: {:d}\n'.format(xcells))
+    f.write('XCells: {:d}\n'.format(xcells))  # TODO: Move into first loop
     for i in range(xcells):
         r = np.average(dat['theta'][i]) / np.average(dat['dist'][i])
         f.write('{:6.1f} {:6.3f}\n'.format(dat['x'][i], r))

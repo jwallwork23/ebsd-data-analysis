@@ -8,12 +8,12 @@ Python package for analysing misorientation distribution.
 * Clone this repo as something with no hyphens, e.g. `ebsdda`.
 * Given a data file `data.ctf`, you should now be able to run the following commands:
 ```
-import ebsdda
+from ebsdda import *
 
-filename = 'data'
-ebsdda.preproc.preproc(filename)
-ebsdda.ctf_reader.ctf_reader(filename)
-ebsdda.plotting.plot_ratio(filename)
+f = 'data'
+preproc(f)
+ctf_reader(f)
+plot_ratio(f)
 ```
 
 ### TODO: Link for dataset
