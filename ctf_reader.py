@@ -55,11 +55,11 @@ def ctf_reader(filename):
             dat['dist'].append([])   # NOTE: We do not know the length of these
             dat['theta'].append([])  #       arrays a priori => dynamic allocation
 
-        # Compute misorientation between two consecutive Euler angles
+        # Compute misorientation between two consecutive Euler angles using quaternions
         if Euler_ is not None:
-            misorientation = compute_misorientation_quat(Euler_, Euler)
+            misorientation = compute_misorientation(Euler_, Euler)
 
-            # If misorientation is greater than 5 degrees, do stuff...
+            # If misorientation is between 1 and 10 degrees, do stuff...
             if (1. < misorientation < 10.) and not started:
                 started = True
                 Y_ = Y
