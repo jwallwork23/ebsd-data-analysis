@@ -1,6 +1,6 @@
 import numpy as np
 
-from ebsdda.maths import compute_misorientation
+from ebsdda.maths import compute_misorientation, symeq
 
 
 __all__ = ["ctf_reader"]
@@ -26,7 +26,8 @@ def ctf_reader(filename):
     n = xcells*ycells                       # Total extent
     f.readline()                            # Skip headings row
 
-    cnt = -1  # Counter for current x-level (becomes 0 at start of first loop)
+    cnt = -1                  # Counter for current x-level (becomes 0 at start of first loop)
+    symlist = symeq('cubic')  # Working numpy array, initialised for efficiency
 
     # Dictionary for data storage
     dat = {}
@@ -37,7 +38,7 @@ def ctf_reader(filename):
     # Open file for output and write header
     g = open(filename + '_misorientations.txt', 'w')
     g.write("{:6s} {:6s} {:6s} {:8s} {:8s}\n".format('X','Y1','Y2','distance','misorientation'))
-    
+
     # Read each line of the file in order
     for i in range(n):
         line = f.readline()
@@ -56,11 +57,13 @@ def ctf_reader(filename):
             dat['x'][cnt] = X        # Current x-position
             dat['dist'].append([])   # NOTE: We do not know the length of these
             dat['theta'].append([])  #       arrays a priori => dynamic allocation
-            print("Y-slice {:d}/{:d} ({:.2f}% complete)".format(i, ycells, float(i)/float(n)*100))
+            print("Y-slice {:d}/{:d} ({:.2f}% complete)".format(cnt+1,
+                                                                ycells,
+                                                                float(i)/float(n)*100))
 
         # Compute misorientation between two consecutive Euler angles using quaternions
         if Euler_ is not None:
-            misorientation = compute_misorientation(Euler_, Euler)
+            misorientation = compute_misorientation(Euler_, Euler, symlist=symlist)
 
             # If misorientation is between 1 and 10 degrees, do stuff...
             if (1. < misorientation < 10.) and not started:

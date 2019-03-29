@@ -20,8 +20,8 @@ if args.r is not None:
     preproc(filename)
 
 # Compute misorientations
-ctf_reader(args.f)
+ctf_reader(filename)
 
 # Plot
 if args.p is not None:
-    plot_ratio(filename, args.f)
+    plot_ratio(filename)

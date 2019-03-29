@@ -1,7 +1,8 @@
 import numpy as N
+import math
 
 
-__all__ = ["compute_misorientations"]
+__all__ = ["compute_misorientations", "symeq"]
 
 
 def disori(a,b,s):
@@ -100,13 +101,15 @@ def symeq(group):
 	
 	return symlist
 
-def compute_misorientation(euler1, euler2):
-    quat1 = Q.euler2quat(euler1)
-    quat2 = Q.euler2quat(euler2)
+def compute_misorientation(euler1, euler2, symlist=None):
+    quat1 = euler2quat(euler1)
+    quat2 = euler2quat(euler2)
 
-    misori=Q.disori(quat1,quat2,Q.symeq('cubic'))
+    if symlist is None:
+        symlist = symeq('cubic')
+    misori=disori(quat1,quat2,symlist)
     eps = 1e-6
     if 1-eps < misori < 1+eps:
         misori = 1
 
-    return N.rad2deg(N.acos(misori))
+    return N.rad2deg(math.acos(misori))
